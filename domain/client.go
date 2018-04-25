@@ -12,5 +12,8 @@ func NewClient(id int64, name string, code string, isActive bool) *Client {
 }
 
 func (c *Client) EqualTo(otherClient Client) bool {
-	return true
+	if c.id == otherClient.id && c.name == otherClient.name && c.code == otherClient.code && c.isActive == otherClient.isActive {
+		return true
+	}
+	return false
 }
