@@ -2,18 +2,22 @@ package controllers
 
 import (
 	"encoding/json"
-	"net/http"
-
+	"github.com/bilfash/trixie/domains"
 	"github.com/bilfash/trixie/interfaces/api/models/requests"
 	"github.com/bilfash/trixie/interfaces/api/models/responses"
 	"github.com/qiangxue/fasthttp-routing"
 )
 
-type ClientController struct {
+type IClientController interface {
+	SendMessage(message []byte) error
 }
 
-func NewClientController() ClientController {
-	return ClientController{}
+type ClientController struct {
+	kafkaProducer IClientController
+}
+
+func NewClientController(kafkaProducer IClientController) ClientController {
+	return ClientController{kafkaProducer}
 }
 
 func (t *ClientController) ClientApiPostHandler(c *routing.Context) error {
@@ -44,6 +48,16 @@ func (t *ClientController) ClientApiPostHandler(c *routing.Context) error {
 		return err
 	}
 
-	c.Response.SetStatusCode(http.StatusOK)
+	clientObj := domains.NewClient(req.Name, req.Code, *req.IsActive)
+	jsonMessage, err := json.Marshal(clientObj)
+	err = t.kafkaProducer.SendMessage(jsonMessage)
+
+	if err != nil {
+		c.Response.SetStatusCode(responses.GetUnknownErrorInstance().HttpStatus)
+		c.Response.SetBody(responses.GetUnknownErrorInstance().Error.GetError())
+		return err
+	}
+
+	c.Response.SetStatusCode(responses.GetAcceptedOkInstance().HttpStatus)
 	return nil
 }

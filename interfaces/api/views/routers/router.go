@@ -10,10 +10,10 @@ type Router struct {
 	clientController controllers.ClientController
 }
 
-func NewRouter() Router {
+func NewRouter(kafkaProducer controllers.IClientController) Router {
 	return Router{
 		routing.New(),
-		controllers.NewClientController(),
+		controllers.NewClientController(kafkaProducer),
 	}
 }
 

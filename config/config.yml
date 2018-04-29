@@ -1,11 +1,23 @@
 production:
   APIConfig:
     port: ":80"
+  KafkaProducerConfig:
+    Address: ""
+    Topic:
+      ClientCreateRequestedTopic: "ClientCreateRequested"
 
 dev:
   APIConfig:
     port: ":8080"
+  KafkaProducerConfig:
+      Address: "localhost:9092"
+      Topic:
+        ClientCreateRequestedTopic: "ClientCreateRequested"
 
 local:
   APIConfig:
-    port: ":1313"
+    port: ":8080"
+  KafkaProducerConfig:
+      Address: "localhost:9092"
+      Topic:
+        ClientCreateRequestedTopic: "ClientCreateRequested"
