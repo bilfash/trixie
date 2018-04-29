@@ -1,9 +1,8 @@
 package api
 
 import (
-	"net/http"
-
 	"github.com/bilfash/trixie/interfaces/api/views/routers"
+	"github.com/valyala/fasthttp"
 )
 
 type HttpServer struct {
@@ -15,7 +14,5 @@ func NewHttpServer(router routers.Router) HttpServer {
 }
 
 func (h *HttpServer) ListenAndServe() {
-	if err := http.ListenAndServe(":8080", h.router.RouterHandler()); err != nil {
-		panic(err)
-	}
+	panic(fasthttp.ListenAndServe(":8080", h.router.RouterHandler().HandleRequest))
 }

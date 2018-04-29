@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/bilfash/trixie/interfaces/api/models/requests"
 	"github.com/bilfash/trixie/interfaces/api/models/responses"
+	"github.com/qiangxue/fasthttp-routing"
 )
 
 type ClientController struct {
@@ -16,34 +16,34 @@ func NewClientController() ClientController {
 	return ClientController{}
 }
 
-func (t *ClientController) ClientApiPostHandler(w http.ResponseWriter, request *http.Request) {
-	bodyBytes, _ := ioutil.ReadAll(request.Body)
+func (t *ClientController) ClientApiPostHandler(c *routing.Context) error {
 	req := &requests.ClientPost{}
-	err := json.Unmarshal([]byte(bodyBytes), &req)
+	err := json.Unmarshal(c.PostBody(), &req)
 
 	if err != nil {
-		w.WriteHeader(responses.GetJsonRequestNotValidInstance().HttpStatus)
-		w.Write(responses.GetJsonRequestNotValidInstance().Error.GetError())
-		return
+		c.Response.SetStatusCode(responses.GetJsonRequestNotValidInstance().HttpStatus)
+		c.Response.SetBody(responses.GetJsonRequestNotValidInstance().Error.GetError())
+		return err
 	}
 
 	if req.Code == "" {
-		w.WriteHeader(responses.GetBadRequestMissingParameterCodeInstance().HttpStatus)
-		w.Write(responses.GetBadRequestMissingParameterCodeInstance().Error.GetError())
-		return
+		c.Response.SetStatusCode(responses.GetBadRequestMissingParameterCodeInstance().HttpStatus)
+		c.Response.SetBody(responses.GetBadRequestMissingParameterCodeInstance().Error.GetError())
+		return err
 	}
 
 	if req.Name == "" {
-		w.WriteHeader(responses.GetBadRequestMissingParameterNameInstance().HttpStatus)
-		w.Write(responses.GetBadRequestMissingParameterNameInstance().Error.GetError())
-		return
+		c.Response.SetStatusCode(responses.GetBadRequestMissingParameterNameInstance().HttpStatus)
+		c.Response.SetBody(responses.GetBadRequestMissingParameterNameInstance().Error.GetError())
+		return err
 	}
 
 	if req.IsActive == nil {
-		w.WriteHeader(responses.GetBadRequestMissingParameterIsActiveInstance().HttpStatus)
-		w.Write(responses.GetBadRequestMissingParameterIsActiveInstance().Error.GetError())
-		return
+		c.Response.SetStatusCode(responses.GetBadRequestMissingParameterIsActiveInstance().HttpStatus)
+		c.Response.SetBody(responses.GetBadRequestMissingParameterIsActiveInstance().Error.GetError())
+		return err
 	}
 
-	w.WriteHeader(http.StatusOK)
+	c.Response.SetStatusCode(http.StatusOK)
+	return nil
 }

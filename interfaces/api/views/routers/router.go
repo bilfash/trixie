@@ -2,22 +2,22 @@ package routers
 
 import (
 	"github.com/bilfash/trixie/interfaces/api/controllers"
-	"github.com/husobee/vestigo"
+	"github.com/qiangxue/fasthttp-routing"
 )
 
 type Router struct {
-	router           *vestigo.Router
+	router           *routing.Router
 	clientController controllers.ClientController
 }
 
 func NewRouter() Router {
 	return Router{
-		vestigo.NewRouter(),
+		routing.New(),
 		controllers.NewClientController(),
 	}
 }
 
-func (r *Router) RouterHandler() *vestigo.Router {
+func (r *Router) RouterHandler() *routing.Router {
 	r.initiateRouter()
 	return r.router
 }
