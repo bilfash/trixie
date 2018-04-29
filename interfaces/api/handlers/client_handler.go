@@ -7,12 +7,7 @@ import (
 	"github.com/bilfash/trixie/interfaces/api/requests"
 	"github.com/bilfash/trixie/interfaces/api/responses"
 	"github.com/bilfash/trixie/interfaces/pubsub"
-	"github.com/qiangxue/fasthttp-routing"
 )
-
-type IClientHandler interface {
-	SendMessageToTopic(topic string, message []byte) error
-}
 
 type ClientHandler struct {
 	config        config.Configuration
@@ -23,31 +18,31 @@ func NewClientHandler(config config.Configuration, kafkaProducer IClientHandler)
 	return ClientHandler{config, kafkaProducer}
 }
 
-func (t *ClientHandler) ClientApiPostHandler(c *routing.Context) error {
+func (t *ClientHandler) ClientApiPostHandler(requestBody []byte, responseHTTP IResponseHTTP) error {
 	req := &requests.ClientPost{}
-	err := json.Unmarshal(c.PostBody(), &req)
+	err := json.Unmarshal(requestBody, &req)
 
 	if err != nil {
-		c.Response.SetStatusCode(responses.GetJsonRequestNotValidInstance().HttpStatus)
-		c.Response.SetBody(responses.GetJsonRequestNotValidInstance().Error.GetError())
+		responseHTTP.SetStatusCode(responses.GetJsonRequestNotValidInstance().HttpStatus)
+		responseHTTP.SetBody(responses.GetJsonRequestNotValidInstance().Error.GetError())
 		return err
 	}
 
 	if req.Code == "" {
-		c.Response.SetStatusCode(responses.GetBadRequestMissingParameterCodeInstance().HttpStatus)
-		c.Response.SetBody(responses.GetBadRequestMissingParameterCodeInstance().Error.GetError())
+		responseHTTP.SetStatusCode(responses.GetBadRequestMissingParameterCodeInstance().HttpStatus)
+		responseHTTP.SetBody(responses.GetBadRequestMissingParameterCodeInstance().Error.GetError())
 		return err
 	}
 
 	if req.Name == "" {
-		c.Response.SetStatusCode(responses.GetBadRequestMissingParameterNameInstance().HttpStatus)
-		c.Response.SetBody(responses.GetBadRequestMissingParameterNameInstance().Error.GetError())
+		responseHTTP.SetStatusCode(responses.GetBadRequestMissingParameterNameInstance().HttpStatus)
+		responseHTTP.SetBody(responses.GetBadRequestMissingParameterNameInstance().Error.GetError())
 		return err
 	}
 
 	if req.IsActive == nil {
-		c.Response.SetStatusCode(responses.GetBadRequestMissingParameterIsActiveInstance().HttpStatus)
-		c.Response.SetBody(responses.GetBadRequestMissingParameterIsActiveInstance().Error.GetError())
+		responseHTTP.SetStatusCode(responses.GetBadRequestMissingParameterIsActiveInstance().HttpStatus)
+		responseHTTP.SetBody(responses.GetBadRequestMissingParameterIsActiveInstance().Error.GetError())
 		return err
 	}
 
@@ -59,11 +54,11 @@ func (t *ClientHandler) ClientApiPostHandler(c *routing.Context) error {
 	err = t.kafkaProducer.SendMessageToTopic(t.config.KafkaProducerConfig.Topic.ClientCreateRequestedTopic, jsonMessage)
 
 	if err != nil {
-		c.Response.SetStatusCode(responses.GetUnknownErrorInstance().HttpStatus)
-		c.Response.SetBody(responses.GetUnknownErrorInstance().Error.GetError())
+		responseHTTP.SetStatusCode(responses.GetUnknownErrorInstance().HttpStatus)
+		responseHTTP.SetBody(responses.GetUnknownErrorInstance().Error.GetError())
 		return err
 	}
 
-	c.Response.SetStatusCode(responses.GetAcceptedOkInstance().HttpStatus)
+	responseHTTP.SetStatusCode(responses.GetAcceptedOkInstance().HttpStatus)
 	return nil
 }

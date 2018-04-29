@@ -24,5 +24,7 @@ func (r *Router) RouterHandler() *routing.Router {
 }
 
 func (r *Router) initiateRouter() {
-	r.router.Post("/client", r.clientHandler.ClientApiPostHandler)
+	r.router.Post("/client", func(context *routing.Context) error {
+		return r.clientHandler.ClientApiPostHandler(context.PostBody(), &context.Response)
+	})
 }
