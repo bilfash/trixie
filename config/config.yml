@@ -1,0 +1,11 @@
+production:
+  APIConfig:
+    port: ":80"
+
+dev:
+  APIConfig:
+    port: ":8080"
+
+local:
+  APIConfig:
+    port: ":1313"
