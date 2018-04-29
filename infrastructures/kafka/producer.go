@@ -2,13 +2,12 @@ package kafka
 
 import "github.com/Shopify/sarama"
 
-type TopicProducer interface {
-	SendMessage(message []byte) error
+type Producer interface {
+	SendMessageToTopic(topic string, message []byte) error
 }
 
 type kafkaProducer struct {
 	address []string
-	topic   string
 }
 
 func getProducerConfig() *sarama.Config {
@@ -23,15 +22,14 @@ func newSyncProducer(address []string) (sarama.SyncProducer, error) {
 	return producer, err
 }
 
-func NewTopicProducer(topic string, address []string) TopicProducer {
+func NewProducer(address []string) Producer {
 	return &kafkaProducer{
 		address: address,
-		topic:   topic,
 	}
 }
 
-func (kProducer *kafkaProducer) SendMessage(message []byte) error {
-	kafkaMsg := &sarama.ProducerMessage{Topic: kProducer.topic, Value: sarama.StringEncoder(message)}
+func (kProducer *kafkaProducer) SendMessageToTopic(topic string, message []byte) error {
+	kafkaMsg := &sarama.ProducerMessage{Topic: topic, Value: sarama.StringEncoder(message)}
 	producer, err := newSyncProducer(kProducer.address)
 	defer producer.Close()
 	_, _, err = producer.SendMessage(kafkaMsg)

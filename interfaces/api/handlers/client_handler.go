@@ -1,26 +1,29 @@
-package controllers
+package handlers
 
 import (
 	"encoding/json"
+	"github.com/bilfash/trixie/config"
 	"github.com/bilfash/trixie/domains"
-	"github.com/bilfash/trixie/interfaces/api/models/requests"
-	"github.com/bilfash/trixie/interfaces/api/models/responses"
+	"github.com/bilfash/trixie/interfaces/api/requests"
+	"github.com/bilfash/trixie/interfaces/api/responses"
+	"github.com/bilfash/trixie/interfaces/pubsub"
 	"github.com/qiangxue/fasthttp-routing"
 )
 
-type IClientController interface {
-	SendMessage(message []byte) error
+type IClientHandler interface {
+	SendMessageToTopic(topic string, message []byte) error
 }
 
-type ClientController struct {
-	kafkaProducer IClientController
+type ClientHandler struct {
+	config        config.Configuration
+	kafkaProducer IClientHandler
 }
 
-func NewClientController(kafkaProducer IClientController) ClientController {
-	return ClientController{kafkaProducer}
+func NewClientHandler(config config.Configuration, kafkaProducer IClientHandler) ClientHandler {
+	return ClientHandler{config, kafkaProducer}
 }
 
-func (t *ClientController) ClientApiPostHandler(c *routing.Context) error {
+func (t *ClientHandler) ClientApiPostHandler(c *routing.Context) error {
 	req := &requests.ClientPost{}
 	err := json.Unmarshal(c.PostBody(), &req)
 
@@ -48,9 +51,12 @@ func (t *ClientController) ClientApiPostHandler(c *routing.Context) error {
 		return err
 	}
 
-	clientObj := domains.NewClient(req.Name, req.Code, *req.IsActive)
-	jsonMessage, err := json.Marshal(clientObj)
-	err = t.kafkaProducer.SendMessage(jsonMessage)
+	clientMessage := pubsub.ClientMessage{
+		Client: *domains.NewClient(req.Name, req.Code, *req.IsActive),
+		ReqId:  "THISISUUID",
+	}
+	jsonMessage, _ := json.Marshal(clientMessage)
+	err = t.kafkaProducer.SendMessageToTopic(t.config.KafkaProducerConfig.Topic.ClientCreateRequestedTopic, jsonMessage)
 
 	if err != nil {
 		c.Response.SetStatusCode(responses.GetUnknownErrorInstance().HttpStatus)
