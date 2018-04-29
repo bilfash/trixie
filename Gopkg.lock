@@ -26,6 +26,12 @@
   version = "0.2"
 
 [[projects]]
+  name = "github.com/husobee/vestigo"
+  packages = ["."]
+  revision = "f8f5b5dc2bd74408887fd4b462055e324c4cbd63"
+  version = "v1.1.0"
+
+[[projects]]
   name = "github.com/opentracing/opentracing-go"
   packages = [
     ".",
@@ -45,6 +51,24 @@
   packages = ["assert"]
   revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
   version = "v1.2.1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/xeipuuv/gojsonpointer"
+  packages = ["."]
+  revision = "4e3ac2762d5f479393488629ee9370b50873b3a6"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/xeipuuv/gojsonreference"
+  packages = ["."]
+  revision = "bd5ef7bd5415a7ac448318e64f11a24cd21e594b"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/xeipuuv/gojsonschema"
+  packages = ["."]
+  revision = "2c8e4be869c17540b336bab0ea18b8d73e6a28b7"
 
 [[projects]]
   branch = "master"
@@ -101,6 +125,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bb1a9faa1c2139b902e5e926c0bfcd7762f71ba2ab6e79d40bc05837032c69c0"
+  inputs-digest = "b1f3f2fc6ed65b603d07d6b2071ac677a1fc95ce64a23c44324c859a351f7f62"
   solver-name = "gps-cdcl"
   solver-version = 1

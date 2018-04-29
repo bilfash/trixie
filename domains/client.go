@@ -1,7 +1,7 @@
 package domains
 
-type ClientRepo interface {
-	Insert(client Client) error
+type ClientRepository interface {
+	Store(client Client) error
 }
 
 type Client struct {
